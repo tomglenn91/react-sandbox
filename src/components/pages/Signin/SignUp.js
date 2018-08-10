@@ -1,6 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
+import { auth } from '../../../firebase'
 import * as routes from '../../../constants/routes'
 
 
@@ -9,28 +10,46 @@ const byPropKey = (propertyName, value) => () =>
         [propertyName]: value
     })
 
-const SignUpPage = () =>
+const SignUpPage = ({history}) =>
     <div>
         <h1>Sign Up</h1>
-        <SignUpForm />
+        <SignUpForm history={history} />
     </div>
 
 
 class SignUpForm extends React.Component {
+
+    defaultState = {
+        username: '',
+        email: '',
+        passwordOne: '',
+        passwordTwo: '',
+        error: null
+    }
+
     constructor(props) {
         super(props)
 
-        this.state = {
-            username: '',
-            email: '',
-            passwordOne: '',
-            passwordTwo: '',
-            error: null
-        }
+        this.state = { ...this.defaultState }
     }
 
     onSubmit = (event) => {
+        const {
+            username, email, passwordOne
+        } = this.state
 
+        auth.createUser(email, passwordOne)
+            .then(user => {
+                console.log('created user ', user)
+                this.setState({...this.defaultState})
+
+                this.props.history.push(routes.HOME)
+            })
+            .catch(error => {
+                this.setState(byPropKey('error', error))
+            })
+
+        event.preventDefault()
     }
 
     render = () => {
@@ -77,7 +96,7 @@ class SignUpForm extends React.Component {
                     Sign Up
                 </button>
 
-                {error && <p>{error}</p>}
+                {error && <p>{error.message}</p>}
             </form>
         )
     }
@@ -90,7 +109,7 @@ const SignUpLink = () =>
     </p>
 
 
-export default SignUpPage
+export default withRouter(SignUpPage)
 
 export {
     SignUpForm,

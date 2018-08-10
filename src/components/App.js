@@ -5,10 +5,13 @@ import * as routes from '../constants/routes';
 
 import Navigation from './Navigation'
 import SignUp from './pages/Signin/SignUp'
+import SignIn from './pages/Signin/SignIn';
+import withAuthentication from './withAuthentication'
 
 import './App.css';
 
 class App extends Component {
+
   render() {
     return (
       <Router>
@@ -18,10 +21,11 @@ class App extends Component {
           <hr />
 
           <Route exact path={routes.SIGN_UP} component={SignUp} />
+          <Route exact path={routes.SIGN_IN} component={SignIn} />
         </div>
       </Router>
     )
   }
 }
 
-export default App;
+export default withAuthentication(App);
